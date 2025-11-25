@@ -81,12 +81,11 @@ trait QueryCacheStrategy
         if(count($cacheKeyParts) > 1){
             $identifiers = json_decode($cacheKeyParts[1]);
         }
-        $result = [];
+        $indexKeys = [];
         foreach($identifiers as $primaryKey){
-            $indexKey = $this->makeEntityIndexKey($cacheKey, $primaryKey);
-            $result[] = $this->getCache()->tags($this->cacheTag)->get($indexKey);
+            $indexKeys[] = $this->makeEntityIndexKey($cacheKey, $primaryKey);
         }
-        return $result;
+        return $this->getCache()->tags($this->cacheTag)->get($indexKeys);
     }
 
 
