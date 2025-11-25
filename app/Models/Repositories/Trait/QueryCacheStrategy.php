@@ -9,6 +9,7 @@ trait QueryCacheStrategy
 {
     /** @var string $cacheTag */
     private $cacheTag = '';
+    private $idSeparator = '___';
 
     /**
      * @param array $params
@@ -17,7 +18,10 @@ trait QueryCacheStrategy
     public function makeKey(array $params = [])
     {
         $params['_v'] = $this->getCacheVersion();
-        return md5(json_encode($params));
+
+        $identifiers = is_array($params['id']) ? $params['id'] : [$params['id']];
+
+        return md5(json_encode($params)) . $this->idSeparator . json_encode($identifiers);
     }
 
     /**
@@ -72,9 +76,17 @@ trait QueryCacheStrategy
     }
 
     public function getByIndexKey($cacheKey){
-        $primaryKey = 0; // TODO: obtain $primaryKey
-        $indexKey = $this->makeEntityIndexKey($cacheKey, $primaryKey);
-        return $this->getCache()->tags($this->cacheTag)->get($indexKey);
+        $cacheKeyParts = explode($this->idSeparator, $cacheKey);
+        $identifiers = [];
+        if(count($cacheKeyParts) > 1){
+            $identifiers = json_decode($cacheKeyParts[1]);
+        }
+        $result = [];
+        foreach($identifiers as $primaryKey){
+            $indexKey = $this->makeEntityIndexKey($cacheKey, $primaryKey);
+            $result[] = $this->getCache()->tags($this->cacheTag)->get($indexKey);
+        }
+        return $result;
     }
 
 
