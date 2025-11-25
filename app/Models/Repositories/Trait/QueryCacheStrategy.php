@@ -52,7 +52,7 @@ trait QueryCacheStrategy
         if ($data instanceof Collection) {
             foreach ($data as $entity) {
                 if ($entity instanceof Entity) {
-                    $this->putByIndexKey($cache, $cacheKey, $data);
+                    $this->putByIndexKey($cache, $cacheKey, $entity);
                 }
             }
         }
