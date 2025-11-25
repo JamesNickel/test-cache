@@ -12,6 +12,7 @@ trait QueryCacheStrategy
     private $idSeparator = '___';
 
     /**
+     * Appends cache-version and ids to the cacheKey
      * @param array $params
      * @return string
      */
@@ -19,9 +20,10 @@ trait QueryCacheStrategy
     {
         $params['_v'] = $this->getCacheVersion();
 
-        $identifiers = is_array($params['id']) ? $params['id'] : [$params['id']];
+        //$identifiers = is_array($params['id']) ? $params['id'] : [$params['id']];
 
-        return md5(json_encode($params)) . $this->idSeparator . json_encode($identifiers);
+        //return md5(json_encode($params)) . $this->idSeparator . json_encode($identifiers);
+        return md5(json_encode($params));
     }
 
     /**
@@ -30,8 +32,8 @@ trait QueryCacheStrategy
      */
     public function get(string $cacheKey)
     {
-        //return $this->getCache()->tags($this->cacheTag)->get($cacheKey);
-        return $this->getByIndexKey($cacheKey);
+        return $this->getCache()->tags($this->cacheTag)->get($cacheKey);
+        //return $this->getByIndexKey($cacheKey);
     }
 
     /**
@@ -71,7 +73,7 @@ trait QueryCacheStrategy
 
     public function putByIndexKey($cache, string $cacheKey, Entity $data){
 
-        $indexKey = $this->makeEntityIndexKey($cacheKey, $data->getPrimaryKey());
+        $indexKey = $this->makeEntityIndexKey($cacheKey, $data->id);
         $cache->forever($indexKey, $data);
     }
 

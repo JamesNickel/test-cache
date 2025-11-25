@@ -60,7 +60,7 @@ class MySqlPostRepository extends MySqlRepository implements IPostRepository
     	$post->updatedAt = date('Y-m-d H:i:s');
 
         return $this->newQuery()
-           ->where($this->primaryKey, $post->getPrimaryKey())
+           ->where($this->primaryKey, $post->id)
             ->update([
                 'title' => $post->title,
 				'category_id' => $post->categoryId,

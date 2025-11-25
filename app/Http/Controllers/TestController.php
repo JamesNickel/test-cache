@@ -18,8 +18,10 @@ class TestController extends Controller
         //$dataAfterUpdate = DB::table('posts')->get();
 
         $postCache = new PostRepository();
+
         $post = $postCache->getOneById(1);
         $beforeUpdate = $post->categoryId;
+
         $post->categoryId++;
         $postCache->update($post);
         $post = $postCache->getOneById(1);
