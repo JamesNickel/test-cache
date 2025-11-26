@@ -39,7 +39,7 @@ class MySqlPostRepository extends MySqlRepository implements IPostRepository
     public function getAllByCategoryId(int $categoryId): Collection
     {
         $posts = $this->newQuery()
-            ->where('category_id', '=', $categoryId)
+            ->where('category_id', $categoryId)
             ->get();
 
         return $this->factory->makeCollectionOfEntities($posts);
@@ -48,8 +48,7 @@ class MySqlPostRepository extends MySqlRepository implements IPostRepository
     public function getOneById(int $id): null|Post
     {
         $post = $this->newQuery()
-            ->where('id', '=', $id)
-            ->first();
+            ->find($id);
 
         return $post ? $this->factory->makeEntityFromStdClass($post) : null;
     }
@@ -57,7 +56,7 @@ class MySqlPostRepository extends MySqlRepository implements IPostRepository
     public function getOneByTitle(string $title): null|Post
     {
         $post = $this->newQuery()
-            ->where('title', '=', $title)
+            ->where('title', $title)
             ->first();
 
         return $post ? $this->factory->makeEntityFromStdClass($post) : null;

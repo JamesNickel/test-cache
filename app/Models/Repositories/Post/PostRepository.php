@@ -71,7 +71,6 @@ class PostRepository implements IPostRepository
             'function_name' => 'getOneById',
             'id' => $id,
         ]);
-
         $entity = $this->redisRepository->get($cacheKey);
 
         if ($entity === null) {

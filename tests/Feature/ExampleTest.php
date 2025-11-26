@@ -7,6 +7,7 @@ use App\Models\Repositories\Post\PostRepository;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\PostTableSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use function PHPUnit\Framework\assertNotEmpty;
 
@@ -21,7 +22,7 @@ class ExampleTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function seedDatabase($postRepository){
+    public function seedDatabase($postRepository) : void{
 
         $post = new Post();
         $post->title = 'sample post 1';
@@ -41,18 +42,26 @@ class ExampleTest extends TestCase
         $this->seedDatabase($postRepository);
 
 
-        $post = $postRepository->getAll();
+        $posts = $postRepository->getAll();
 
-        assertNotEmpty($post);
+        assertNotEmpty($posts);
+        assert(count($posts) == 2);
     }
 
     public function test_cache_get_all_by_ids(){
 
         $postRepository = new PostRepository();
         $this->seedDatabase($postRepository);
-        $posts = $postRepository->getAllByIds([1, 2]);
+        $allPosts = $postRepository->getAll();
+        $ids = [];
+        foreach($allPosts as $post){
+            $ids[] = $post->id;
+        }
+
+        $posts = $postRepository->getAllByIds($ids);
 
         assertNotEmpty($posts);
+        assert(count($posts) == 2);
     }
 
     public function test_cache_get_all_by_category_id(){
@@ -63,15 +72,18 @@ class ExampleTest extends TestCase
         $posts = $postRepository->getAllByCategoryId(1);
 
         assertNotEmpty($posts);
+        assert(count($posts) == 2);
     }
 
     public function test_cache_get_one_by_id(){
 
         $postRepository = new PostRepository();
         $this->seedDatabase($postRepository);
-        $posts = $postRepository->getOneById(1);
+        $allPosts = $postRepository->getAll();
 
-        assertNotEmpty($posts);
+        $post = $postRepository->getOneById($allPosts[0]->id);
+
+        assertNotEmpty($post);
     }
 
     public function test_cache_get_one_by_title(){
@@ -81,5 +93,30 @@ class ExampleTest extends TestCase
         $post = $postRepository->getOneByTitle('sample post 1');
 
         assertNotEmpty($post);
+    }
+
+    public function test_cache_check_if_entity_update_is_applied(){
+
+        $postRepository = new PostRepository();
+        $this->seedDatabase($postRepository);
+
+        $allPosts = $postRepository->getAll();
+
+        dump($allPosts);
+
+        $post0CategoryId = $allPosts[0]->categoryId;
+        $post1CategoryId = $allPosts[1]->categoryId;
+
+        $post1 = $postRepository->getOneById($allPosts[1]->id);
+        $post1->categoryId = 1000;
+        $postRepository->update($post1);
+
+        $allPosts = $postRepository->getAll();
+
+        dump($allPosts);
+
+        assert(count($allPosts) == 2);
+        assert($allPosts[0]->categoryId == $post0CategoryId);
+        assert($allPosts[1]->categoryId == 1000);
     }
 }
