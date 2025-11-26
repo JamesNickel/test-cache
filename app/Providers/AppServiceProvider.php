@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Eghamat24\DatabaseRepository\Models\Factories\Factory;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

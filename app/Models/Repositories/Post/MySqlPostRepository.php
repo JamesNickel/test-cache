@@ -19,22 +19,48 @@ class MySqlPostRepository extends MySqlRepository implements IPostRepository
         parent::__construct();
     }
 
+    public function getAll(): Collection
+    {
+        $posts = $this->newQuery()
+            ->get();
+
+        return $this->factory->makeCollectionOfEntities($posts);
+    }
+
+    public function getAllByIds(array $ids): Collection
+    {
+        $posts = $this->newQuery()
+            ->whereIn('id', $ids)
+            ->get();
+
+        return $this->factory->makeCollectionOfEntities($posts);
+    }
+
+    public function getAllByCategoryId(int $categoryId): Collection
+    {
+        $posts = $this->newQuery()
+            ->where('category_id', '=', $categoryId)
+            ->get();
+
+        return $this->factory->makeCollectionOfEntities($posts);
+    }
+
     public function getOneById(int $id): null|Post
     {
         $post = $this->newQuery()
-            ->where('id', $id)
+            ->where('id', '=', $id)
             ->first();
 
         return $post ? $this->factory->makeEntityFromStdClass($post) : null;
     }
 
-    public function getAllByIds(array $ids): Collection
+    public function getOneByTitle(string $title): null|Post
     {
         $post = $this->newQuery()
-            ->whereIn('id', $ids)
-            ->get();
+            ->where('title', '=', $title)
+            ->first();
 
-        return $this->factory->makeCollectionOfEntities($post);
+        return $post ? $this->factory->makeEntityFromStdClass($post) : null;
     }
 
     public function create(Post $post): Post
