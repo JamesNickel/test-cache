@@ -118,6 +118,12 @@ class PostRepository implements IPostRepository
 
     private function removeEntityFromCacheByAllColumnNames(Post $oldEntity, Post $entity){
 
+        $cacheKey = $this->redisRepository->makeKey([
+            'function_name' => 'getAll',
+            'id' => [],
+        ]);
+        $this->redisRepository->clear($cacheKey);
+
         if($oldEntity->title != $entity->title){
 
             $cacheKey = $this->redisRepository->makeKey([

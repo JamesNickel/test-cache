@@ -95,28 +95,28 @@ class ExampleTest extends TestCase
         assertNotEmpty($post);
     }
 
-    public function test_cache_check_if_entity_update_is_applied(){
+    public function test_cache_check_if_entity_update_is_working(){
 
         $postRepository = new PostRepository();
         $this->seedDatabase($postRepository);
 
         $allPosts = $postRepository->getAll();
-
-        dump($allPosts);
+        assertNotEmpty($allPosts);
 
         $post0CategoryId = $allPosts[0]->categoryId;
         $post1CategoryId = $allPosts[1]->categoryId;
 
         $post1 = $postRepository->getOneById($allPosts[1]->id);
-        $post1->categoryId = 1000;
+        assertNotEmpty($post1);
+        $post1->categoryId++;
         $postRepository->update($post1);
 
         $allPosts = $postRepository->getAll();
-
-        dump($allPosts);
+        assertNotEmpty($allPosts);
 
         assert(count($allPosts) == 2);
         assert($allPosts[0]->categoryId == $post0CategoryId);
-        assert($allPosts[1]->categoryId == 1000);
+        assert($allPosts[1]->categoryId > $post1CategoryId);
+        assert($allPosts[1]->categoryId == $post1CategoryId + 1);
     }
 }
